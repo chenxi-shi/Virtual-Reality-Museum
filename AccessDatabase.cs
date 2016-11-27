@@ -6,23 +6,22 @@ using System.Data;
 using System.Collections;
 using System.Collections.Generic;
 
-//订对数据库中的列名
-//如果发生变化, 代码中也要变
-//select U_Level, U_Name, U_Password from User;
-//select ArtW_ID, Fig_Name from Artwork where ArtW_level = 1;
-//select ArtW_ID, Fig_Name from Artwork where ArtW_level = 1 OR ArtW_level = 2;
+// SQL:
+// select U_Level, U_Name, U_Password from User;
+// select ArtW_ID, Fig_Name from Artwork where ArtW_level = 1;   ---> for VIP user only
+// select ArtW_ID, Fig_Name from Artwork where ArtW_level = 1 OR ArtW_level = 2;   ---> for all of the users
 
 public class AccessDatabase : MonoBehaviour {
 
     #region Variables
-    //Static Variables
-    //订对数据库中的名字
+    // Static Variables
+    // check the attribute's name
 
-    float posx, posy, posz;
+    float posx, posy, posz;   // painting location
     int UID;
 
-    //Private Variables
-    //private bool loading = false;
+    // Private Variables
+    // private bool loading = false;
 
     internal MySqlConnection connect;
     // command object
@@ -31,7 +30,7 @@ public class AccessDatabase : MonoBehaviour {
     private MySqlDataReader datareader = null;
     // object collection array
     private GameObject[] bodies;
-    //private Dictionary<string, string> loginPair = new Dictionary<string, string>();
+    // private Dictionary<string, string> loginPair = new Dictionary<string, string>();
 
     // object definitions
     internal struct userData
@@ -57,9 +56,8 @@ public class AccessDatabase : MonoBehaviour {
         print("AccessData Awake() ^_^");
     }
 
-	
 	// Update is called once per frame
-	void Update () {
+	void Update() {
 	
 	}
 
@@ -84,7 +82,7 @@ public class AccessDatabase : MonoBehaviour {
         }
     }
 
-    // Read all entries from the table
+    // Read all entries from user table
     internal void ReadUserInfo()
     {
         print("Excuted AccessData ReadUserInfo() ^_^");
@@ -94,7 +92,7 @@ public class AccessDatabase : MonoBehaviour {
             loginInfo = new List<userData>();
         if (loginInfo.Count > 0)
             loginInfo.Clear();
-        // Error trapping in the simplest form
+
         try
         {
             query = "select `U_Level`, `U_Name`, `U_Password` from `VR`.`User`";
@@ -109,9 +107,9 @@ public class AccessDatabase : MonoBehaviour {
                         while (datareader.Read())
                         {
                             userData uInfo = new userData();
-                            //将Console.ReadLine()得出来的字符串转换为整型(int)
-                            //即使在数据库中为非字符串, 读出来也还是字符串
-                            uInfo.uLevel = int.Parse(datareader["U_Level"].ToString());
+
+                            //database always returns string
+                            uInfo.uLevel = int.Parse(datareader["U_Level"].ToString());  //string --> int
                             uInfo.uName = datareader["U_Name"].ToString();
                             uInfo.uPassword = datareader["U_Password"].ToString();
 
@@ -127,15 +125,12 @@ public class AccessDatabase : MonoBehaviour {
         }
     }
 
-    // Update existing entries in the table based on the iddemo_table
+    // Update pic location of pictures in the table based on the iddemo_table
 
-
-
-    internal void UpdateEntries(int UID, float posx, float posy, float posz)
+    internal void UpdateEntries(int UID, float posx, float posy, float posz) 
     {
         //prepPos();
         string query = string.Empty;
-        // Error trapping in the simplest form
         try
         {
             query = "UPDATE `VR`.`Position` SET `X_p`=?posx, `Y_p`=?posy, `Z_p`=?posz WHERE `Artwork_ArtW_ID`=?UID";
@@ -167,6 +162,7 @@ public class AccessDatabase : MonoBehaviour {
         }
     }
 
+    // read VIP figure info from database
     internal void Read1FigInfo()
     {
         print("Excuted AccessData Read1FigInfo() ^_^");
@@ -176,7 +172,7 @@ public class AccessDatabase : MonoBehaviour {
             figName = new List<string>();
         if (figName.Count > 0)
             figName.Clear();
-        // Error trapping in the simplest form
+
         try
         {
             query = "select `ArtW_ID`, `Fig_Name` from `VR`.`Artwork` where `ArtW_level` = 1";
@@ -191,8 +187,6 @@ public class AccessDatabase : MonoBehaviour {
                         while (datareader.Read())
                         {
                             string loc;
-                            //将Console.ReadLine()得出来的字符串转换为整型(int)
-                            //即使在数据库中为非字符串, 读出来也还是字符串
                             //artWInfo.arwID = int.Parse(datareader["ArtW_ID"].ToString());
                             loc = datareader["Fig_Name"].ToString();
 
@@ -215,6 +209,7 @@ public class AccessDatabase : MonoBehaviour {
         }
     }
 
+    // read all users' figure info from database
     internal void Read2FigInfo()
     {
         print("Excuted AccessData Read2FigInfo() ^_^");
@@ -224,7 +219,7 @@ public class AccessDatabase : MonoBehaviour {
             figName = new List<string>();
         if (figName.Count > 0)
             figName.Clear();
-        // Error trapping in the simplest form
+
         try
         {
             query = "select `ArtW_ID`, `Fig_Name` from `VR`.`Artwork` where `ArtW_level` = 1 OR `ArtW_level` = 2";
@@ -256,6 +251,7 @@ public class AccessDatabase : MonoBehaviour {
         }
     }
 
+    // close connection to database
     void OnApplicationQuit()
     {
         Debug.Log("killing con");

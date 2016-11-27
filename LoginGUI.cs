@@ -37,9 +37,7 @@ public class LoginGUI : MonoBehaviour {
     void Awake()
     {
         //constate = "";
-        print("LoginGUI Awake() ^_^");
-
-        
+        print("LoginGUI Awake() ^_^");       
     }
 
     void Start()
@@ -52,17 +50,17 @@ public class LoginGUI : MonoBehaviour {
         print("ONGUI!!!!!");
         print("compareinput" + compareinput);
 
-        //鼠标
+        //mouse
         GUI.DrawTexture(new Rect(Event.current.mousePosition.x - cursorSizeX / 2, Event.current.mousePosition.y - cursorSizeY / 2, cursorSizeX, cursorSizeY), CursorTex);
-        //连接mysql
+        
         if (getConInfo == true)
         {
             GUI.Window(0, new Rect(Screen.width / 2 - 100, Screen.height / 2 - 85, 200, 150), connectWindowFunc, "Connect Infomation");            
         }
 
+        //connect to mysql
         if (tryConnect == true)
         {
-
             print("LoginData.constr = " + PlayerPrefs.GetString("constr"));
             LoginData.buildConnect(PlayerPrefs.GetString("constr"));
             if (LoginData.connect.State.Equals(ConnectionState.Open))
@@ -80,8 +78,9 @@ public class LoginGUI : MonoBehaviour {
 
                 print("the first userinfo: " + LoginData.loginInfo[0].uName);
                 print("the first userinfo: " + LoginData.loginInfo[0].uPassword);
-                tryConnect = false;
+                
                 compareinput = true;
+                tryConnect = false;
             }
             else
             {
@@ -89,8 +88,7 @@ public class LoginGUI : MonoBehaviour {
                 tryConnect = false;
             }
         }
-
-            //print(LoginData.connect.State);
+        //print(LoginData.connect.State);
             
         if (compareinput)
         {
@@ -102,7 +100,6 @@ public class LoginGUI : MonoBehaviour {
             try
             {
                 GUI.Window(0, new Rect(Screen.width / 2 - 100, Screen.height / 2 - 55, 200, 110), loginWindowFunc, "Login Window");
-
                 //GUI.Window(0, new Rect(Screen.width / 2 - 100, Screen.height / 2 - 85, 200, 110), loginWindowFunc, "Connect Successful! Login Please");
             }
             catch (Exception ex)
@@ -151,14 +148,13 @@ public class LoginGUI : MonoBehaviour {
 
     void loginWindowFunc(int windowID)
     {
-        print("loginWindowFunc!^_^"); //执行了
+        print("loginWindowFunc!^_^"); 
 
         GUI.Label(new Rect(10, 30, 60, 20), "ID");
         inputUName = GUI.TextField(new Rect(80, 30, 100, 20), inputUName);
         GUI.Label(new Rect(10, 50, 60, 20), "Password");
         inputUPassword = GUI.PasswordField(new Rect(80, 50, 100, 20), inputUPassword, "*"[0]);
 
-		
         if (GUI.Button(new Rect(70, 80, 50, 20), "Login"))
         {
             print("Press login button! ^-^");

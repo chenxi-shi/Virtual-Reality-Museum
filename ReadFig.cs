@@ -7,18 +7,16 @@ using System.Drawing;
 
 public class ReadFig : MonoBehaviour {
 
-    //delete figNameArr after connection to database part
+    //delete figNameArr after connection to database
     //private List<string> figNameArr;
     public Transform Fig;
-    //单位角度 a
-    private float a;
+    private float a;  //unit angle
     private Quaternion q;
     private List<Transform> figClone = new List<Transform>();
     public AccessDatabase AccessData;
     private int UserLevel;
     private int U_ID;
     private float pos_x, pos_y, pos_z;
-
 
 
     void Awake()
@@ -28,11 +26,10 @@ public class ReadFig : MonoBehaviour {
         AccessData.ReadUserInfo();
     }
 
-    // Use this for initialization
+    // initialization
     void Start ()
     {
         print("ReadFig START() ^_^");
-		
 		LoginFig();
     }
 	
@@ -53,40 +50,37 @@ public class ReadFig : MonoBehaviour {
 		}           		
 	}
 	
-    void loadImage(List<Transform> fC, List<string> fN)
+    void loadImage(List<Transform> transfor, List<string> fig_name_lst)
     {
-        fC = new List<Transform>();
-        //画的数量
-        print("The num of Fig: " + fN.Count);
-        //单位角度    
-        a = 360 / fN.Count;
-        //Debug.Log("角度 a=" + a);
+        // Design: let all of the figures show as a circle
+        transform_lst = new List<Transform>();  // count of figures
+        a = 360 / fig_name_lst.Count;  // unit angle 
+        // Debug.Log("unit angle a=" + a);
+        print("The num of Fig: " + fig_name_lst.Count);
 
-        for (int i = 0; i < fN.Count; i++)
+        // create instances for figures and render them
+        for (int i = 0; i < fig_name_lst.Count; i++)
         {
-            //为f加一个实例
-            fC.Add(Instantiate(Fig));
-
-            //为实例加载图画
-            addTexture(fN[i], fC[i]);
+            transform_lst.Add(Instantiate(Fig));
+            addTexture(fig_name_lst[i], transform_lst[i]);
         }
 
-        for (int i = 0; i < fN.Count; i++)
+        for (int i = 0; i < fig_name_lst.Count; i++)
         {
-            //计算quanternion位置
+            // locate the figure
+            // caculate the Quaternion coordinate from vector3 coordinate system
             q = Quaternion.AngleAxis(i * a + 180F, Vector3.up);
 
-            //为f的实例定位
-            //将quanternion转化为vector3
-            //print("旋转轴" + Vector3.up);
-            //print("Rotation2: " + q);
+            // quanternion --> vector3
+            // print("Rotation axis" + Vector3.up);
+            // print("Rotation2: " + q);
 
-            //公转 * Quaternion * Vector3 = Vector3
-            fC[i].position = new Vector3(0, 1, 0) + Quaternion.AngleAxis((i+1) * a, Vector3.up) * Vector3.forward * 3;
-            //自转
-            fC[i].rotation = q;
+            // revolution * Quaternion * Vector3 = Vector3
+            transform_lst[i].position = new Vector3(0, 1, 0) + Quaternion.AngleAxis((i+1) * a, Vector3.up) * Vector3.forward * 3;
+            // rotation
+            transform_lst[i].rotation = q;
 
-            prepPos(fC[i]);
+            prepPos(transform_lst[i]);
             AccessData.UpdateEntries(i + 1, pos_x, pos_y, pos_z);
         }
     }
@@ -112,29 +106,29 @@ public class ReadFig : MonoBehaviour {
         //Debug.Log("Items in collection: " + _GameItems.Count);
     }
 
-    //加载图画
-    void addTexture(string loc, Transform aTrfm)
+    // render figure
+    void addTexture(string fig_loc, Transform aTrfm)
     {
         print("addTexture 执行了! ^_^");
 
-        //从loc处取图片作为texture
-        Texture t = Resources.Load(loc) as Texture;
+        // load figure as texture
+        Texture t = Resources.Load(fig_loc) as Texture;
 
         float Ra = H_W_Ratio(t.width, t.height);
-        //print(loc + Ra);
+        //print(fig_loc + Ra);
         if (t == null)
             Debug.Log("Load Object Fail");
 
         aTrfm.localScale = new Vector3(1F, Ra * 2F, 1F);
-        print(loc);
-        //print("父对象局部比例: " + aTrfm.localScale);
-        //print("全局缩放比例: " + aTrfm.lossyScale);
+        print(fig_loc);
+        //print("Parent object local proportion: " + aTrfm.localScale);
+        //print("Global zoom proportion: " + aTrfm.lossyScale);
 
-        //为一个f实例加texture
+        // render the texture
         aTrfm.GetComponent<Renderer>().material.mainTexture = t;
     }
 
-    //读画的比例
+    // read the hight and width of picture
     float H_W_Ratio(float w, float h)
     {
         //print("weight: " + w);
